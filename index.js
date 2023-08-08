@@ -3,7 +3,8 @@ kaboom({
     height:720
 })
 
-loadSprite('background-1','/BitcoinBobby/gaming/images/background1.jpg')
+loadSprite('background-1','./images/background1.jpg')
+loadSprite('lamp', './images/Character 03/Png/Lamp_post.png')
 
 add([
     sprite('background-1'),
@@ -12,10 +13,19 @@ add([
     ])
     
 add([
-    sprite('background-1'),
+    sprite('lamp'),
     fixed(),
-    position(1000, 0),
-    scale(4)
+    scale(4),
+    pos(50, 210)
+    ])
+    
+    add([
+    sprite('lamp'),
+    fixed(),
+    scale(4),
+    pos(1000, 210)
     ]).flipX = true
     
-    loadSpriteAtlas()
+    // loadSpriteAtlas()
+    
+    
