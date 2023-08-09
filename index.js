@@ -8,18 +8,27 @@ loadSprite('background-1', './images/background1.jpg')
 
 loadSprite('lamp', './images/Character 03/Png/Lamp_post.png')
 
-loadSprite('idle-sprite', './images/mark.png', {
-    sliceX: 8,
+loadSprite('idle-sprite', './images/Character 03/Png/Character Sprite/spritesheet (3).png', {
+    sliceX: 20,
     sliceY: 1,
-    anims: { 'idle-anim': { from: 0, to: 7, loop: true }}
+    anims: { 'idle-anim': { from: 0, to: 19, loop: true }}
 })
 
-loadSprite('run-sprite', './images/mark.png', {
+loadSprite('run-sprite', './images/Character 03/Png/Character Sprite/spritesheet (1).png', {
     sliceX: 8,
     sliceY: 1,
     anims: { 'run-anim': { from: 0, to: 7, loop: true }}
 })
-
+loadSprite('jump-sprite', './images/Character 03/Png/Character Sprite/spritesheet (2).png', {
+    sliceX: 20,
+    sliceY: 1,
+    anims: { 'jump-anim': { from: 0, to: 19, loop: true }}
+})
+loadSprite('fall-sprite', './images/Character 03/Png/Character Sprite/spritesheet (4).png', {
+    sliceX: 10,
+    sliceY: 1,
+    anims: { 'fall-anim': { from: 0, to: 9, loop: true }}
+})
 
 loadSpriteAtlas('./images/Tiles.png', {
     'platform-left': {
@@ -64,7 +73,7 @@ add([
 
 const map = addLevel([
         '5                                      5',
-        '5                                      5',
+        '5    1111                              5',
         '5                                      5',
         '5                                      5',
         '5                                      5',
@@ -76,7 +85,7 @@ const map = addLevel([
         '5                                      5',
         '5                                      5',
         '5                 111                  5',
-        '5          111                         5',
+        '5   111    111                         5',
         '5                                      5',
         '5   111           1            1       5',
         '5                                      5',
@@ -111,10 +120,11 @@ const map = addLevel([
         }
 
     })
+// map.use(scale(4))
 
 const player = add([
     sprite('idle-sprite'),
-    scale(1),
+    scale(2),
     area({shape: new Rect(vec2(0), 16, 16), offset: vec2(0,16)}),
     anchor('center'),
     body(),
@@ -164,5 +174,35 @@ onKeyRelease('left', () => {
 onKeyPress('up', () => {
     if (player.isGrounded()) {
         player.jump()
+    }
+})
+
+// camScale(1.5)
+
+onUpdate(() => {
+    
+    if (player.previousHeight){
+        player.heightDelta = player.previousHeight - player.pos.y
+    }
+    player.previousHeight = player.pos.y
+    
+    if (player.curAnim() !== 'run-anim' && player.isGrounded()) {
+        player.use(sprite('idle-sprite'))
+        player.play('idle-anim')
+    }
+     if (player.curAnim() !== 'jump-anim' && !player.isGrounded() && player.heightDelta > 0) {
+        player.use(sprite('jump-sprite'))
+        player.play('jump-anim')
+    }
+
+    if (player.curAnim() !== 'fall-anim' && !player.isGrounded() && player.heightDelta < 0) {
+        player.use(sprite('fall-sprite'))
+        player.play('fall-anim')
+    }
+    
+    if (player.direction === 'left'){
+        player.flipX = true
+    } else {
+        player.flipX = false
     }
 })
