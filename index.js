@@ -30,24 +30,10 @@ loadSprite('fall-sprite', './images/Character 03/Png/Character Sprite/spriteshee
     anims: { 'fall-anim': { from: 0, to: 9, loop: true }}
 })
 
-loadSpriteAtlas('./images/Tiles.png', {
-    'platform-left': {
-        x: 440,
-        y: 380,
-        width: 32,
-        height: 32
-    },
-    'platform-middle': {
-        x: 520,
-        y: 240,
-        width: 32,
-        height: 32
-    },
-})
-
-
 setGravity(1000)
 
+scene("game", ({ score }) => {
+    
 add([
     sprite('background-1'),
     fixed(),
@@ -68,9 +54,20 @@ add([
     pos(1000, 210)
 ]).flipX = true
 
-
-// console.log(atlas)
-
+loadSpriteAtlas('./images/Tiles.png', {
+    'platform-left': {
+        x: 440,
+        y: 380,
+        width: 32,
+        height: 32
+    },
+    'platform-middle': {
+        x: 520,
+        y: 240,
+        width: 32,
+        height: 32
+    },
+})
 const map = addLevel([
         '5                                      5',
         '5    1111                              5',
@@ -206,3 +203,26 @@ onUpdate(() => {
         player.flipX = false
     }
 })
+})
+scene("gameover", (score) => {
+ 
+  add([
+    text(
+      "gameover!\n"
+      + "score: " + score
+      + "\nhigh score: " + highScore,
+      {size: 45}
+    )
+  ]);
+
+  keyPress("space", () => {
+    go("game");
+  });
+});
+
+
+go("game", { score: 0})
+
+// // reset cursor to default at frame start for easier cursor management
+// onUpdate(() => cursor("default"))
+
