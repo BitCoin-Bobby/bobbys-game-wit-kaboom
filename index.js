@@ -227,13 +227,11 @@ onUpdate(() => {
         player.flipX = false
     }
 })
-
-const score = add([
+score = add([
     text("Coins: 0/10"),
     pos(24, 24),
     { value: 0 },
 ])
-
 player.onCollide("coin", (c) => {
     destroy(c)
     score.value += 1
