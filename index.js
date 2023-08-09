@@ -30,6 +30,13 @@ loadSprite('fall-sprite', './images/Character 03/Png/Character Sprite/spriteshee
     anims: { 'fall-anim': { from: 0, to: 9, loop: true }}
 })
 
+loadSprite('coin', './images/spritesheet (5).png', {
+    sliceX:8,
+    sliceY:1,
+    anims: {'coin-anim': { from: 0, to: 7, loop: true}}
+})
+
+
 setGravity(1000)
 
 scene("game", ({ score }) => {
@@ -54,6 +61,16 @@ add([
     pos(1000, 210)
 ]).flipX = true
 
+
+add([
+    sprite('coin'),
+    fixed(),
+    scale(4),
+    ])
+
+
+// console.log(atlas)
+
 loadSpriteAtlas('./images/Tiles.png', {
     'platform-left': {
         x: 440,
@@ -75,19 +92,19 @@ const map = addLevel([
         '5                                      5',
         '5                                      5',
         '5                                      5',
-        '5                                      5',
-        '5                                      5',
-        '5                                      5',
-        '5                                      5',
-        '5                                      5',
-        '5                                      5',
-        '5                 111                  5',
+        '5            11       11               5',
+        '5                        $$$           5',
+        '5                        111           5',
+        '5       $$                             5',
+        '5       11    11                       5',
+        '5                           $$$        5',
+        '5                 111       111        5',
         '5   111    111                         5',
-        '5                                      5',
+        '5                 $            $       5',
         '5   111           1            1       5',
-        '5                                      5',
+        '5                                  @   5',
         '1111111111111111111111111111111111111111',
-        '5                                      5',
+        '5555555555555555555555555555555555555555',
         '5                                      5',
         '5                                      5',
         '5                                      5',
@@ -112,11 +129,18 @@ const map = addLevel([
                 area(),
                 body({ isStatic: true })
             ],
-
+            "$": () => [
+			    sprite("coin"),
+			    area(),
+			    pos(0, 1),
+			    offscreen({ hide: true }),
+			"coin",
+		],
 
         }
 
     })
+    
 // map.use(scale(4))
 
 const player = add([
@@ -177,12 +201,12 @@ onKeyPress('up', () => {
 // camScale(1.5)
 
 onUpdate(() => {
-    
+
     if (player.previousHeight){
         player.heightDelta = player.previousHeight - player.pos.y
     }
     player.previousHeight = player.pos.y
-    
+
     if (player.curAnim() !== 'run-anim' && player.isGrounded()) {
         player.use(sprite('idle-sprite'))
         player.play('idle-anim')
@@ -196,13 +220,38 @@ onUpdate(() => {
         player.use(sprite('fall-sprite'))
         player.play('fall-anim')
     }
-    
+
     if (player.direction === 'left'){
         player.flipX = true
     } else {
         player.flipX = false
     }
 })
+
+const score = add([
+    text("Coins: 0/10"),
+    pos(24, 24),
+    { value: 0 },
+])
+
+player.onCollide("coin", (c) => {
+    destroy(c)
+    score.value += 1
+    score.text = `Coins: ${score.value}/10`
+})
+
+	player.onCollide("portal", () => {
+		play("portal")
+		if (levelId + 1 < LEVELS.length) {
+			go("game", {
+				levelId: levelId + 1,
+				coins: coins,
+			})
+		} else {
+			go("win")
+		}
+	})
+
 })
 scene("gameover", (score) => {
  
