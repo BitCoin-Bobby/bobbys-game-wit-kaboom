@@ -1,6 +1,7 @@
 kaboom({
-    width: 1280,
-    height: 720
+    global: true,
+    fullscreen: true,
+    scale: 1,
 })
 
 loadSprite('background-1', './images/background1.jpg')
@@ -62,12 +63,13 @@ add([
 ]).flipX = true
 
 
-add([
+let coin = add([
     sprite('coin'),
     fixed(),
     scale(4),
     ])
-
+coin.use(sprite('coin'))
+coin.play('coin-anim')
 
 // console.log(atlas)
 
@@ -227,7 +229,7 @@ onUpdate(() => {
         player.flipX = false
     }
 })
-score = add([
+ score = add([
     text("Coins: 0/10"),
     pos(24, 24),
     { value: 0 },
