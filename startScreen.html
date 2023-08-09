@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="startScreen.css" type="text/css" />
+    <title>Main Screen</title>
+</head>
+
+<body>
+    <div class="background">
+
+    </div>
+    <div class="character-icon">
+        <img src="landingPageImages/Character-Parachute_08.png" alt="Parachute" class="parachute">
+    </div>
+    <div class="title-and-button-container">
+        <h1 class="game-title">
+            <img src="landingPageImages/coin.png" alt="Coin Image" class="image-left-of-title">
+            Bitcoin Bobby
+        </h1>
+        <button id="start-button" class="start-button">Start Game</button>
+    </div>
+    <div class="bottom-left">
+        <button class="how-to-play-button">How to Play</button>
+        <button class="toggle-sound-button">
+            <img src="landingPageImages/audio-on.svg" alt="Toggle Sound" class="sound-icon" id="sound-icon">
+        </button>
+    </div>
+    <audio id="backgroundAudio" loop>
+        <source src="backgroundSound.mp3" type="audio/mp3">
+        Audio Element Not Supported.
+    </audio>
+    <script>
+        const startButton = document.getElementById("start-button");
+        startButton.addEventListener("click", function() {
+            window.location.href = "index.html";
+        });
+    </script>
+    <script src="sound.js"></script>
+</body>
+
+</html>
