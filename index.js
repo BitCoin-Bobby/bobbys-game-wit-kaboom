@@ -1,13 +1,15 @@
 kaboom({
-    global: true,
-    fullscreen: true,
-    scale: 1,
+    width: 1280,
+    height: 720
 })
 
 loadSprite('background-1', './images/background1.jpg')
-
+loadSprite('background-2', './images/background2.jpg')
+loadSprite('background-3', './images/background3.jpg')
 
 loadSprite('lamp', './images/Character 03/Png/Lamp_post.png')
+
+loadSprite('portal', './images/1.png')
 
 loadSprite('idle-sprite', './images/Character 03/Png/Character Sprite/spritesheet (3).png', {
     sliceX: 20,
@@ -37,41 +39,15 @@ loadSprite('coin', './images/spritesheet (5).png', {
     anims: {'coin-anim': { from: 0, to: 7, loop: true}}
 })
 
-
+const fall = 1000
 setGravity(1000)
 
 scene("game", ({ score }) => {
-    
 add([
     sprite('background-1'),
     fixed(),
     scale(4)
 ])
-
-add([
-    sprite('lamp'),
-    fixed(),
-    scale(4),
-    pos(50, 210)
-])
-
-add([
-    sprite('lamp'),
-    fixed(),
-    scale(4),
-    pos(1000, 210)
-]).flipX = true
-
-
-let coin = add([
-    sprite('coin'),
-    fixed(),
-    scale(4),
-    ])
-coin.use(sprite('coin'))
-coin.play('coin-anim')
-
-// console.log(atlas)
 
 loadSpriteAtlas('./images/Tiles.png', {
     'platform-left': {
@@ -88,31 +64,27 @@ loadSpriteAtlas('./images/Tiles.png', {
     },
 })
 const map = addLevel([
-        '5                                      5',
-        '5    1111                              5',
-        '5                                      5',
-        '5                                      5',
-        '5                                      5',
-        '5                                      5',
-        '5            11       11               5',
-        '5                        $$$           5',
-        '5                        111           5',
-        '5       $$                             5',
-        '5       11    11                       5',
-        '5                           $$$        5',
-        '5                 111       111        5',
-        '5   111    111                         5',
-        '5                 $            $       5',
-        '5   111           1            1       5',
-        '5                                  @   5',
-        '1111111111111111111111111111111111111111',
-        '5555555555555555555555555555555555555555',
-        '5                                      5',
-        '5                                      5',
-        '5                                      5',
-        '5                                      5',
-
-
+        '5                                          5',
+        '5                      $ $        $        5',
+        '5         11111      11111     11111       5',
+        '5                                          5',
+        '5              $  $          $             5',
+        '5              11111       11111           5',
+        '5      $  $                                5',
+        '5     11111         111111             111 5',
+        '5                                          5',
+        '5                     $          $ $       5',
+        '5         11111      11111     11111       5',
+        '5                                          5',
+        '5111111        $   $                       5',
+        '5              11111       11111           5',
+        '5                                       $  5',
+        '5     11111         111111             111 5',
+        '5                                          5',
+        '5 $  $         $   $                    4  5',
+        '11111111111111111111111111111111111111111111',
+        '5                                          5',
+        '5                                          5',
     ],
 
     {
@@ -120,30 +92,38 @@ const map = addLevel([
         tileHeight: 32,
         tiles: {
             5: () => [
-                 rect(16, 16),
-            opacity(0),
-            area(),
-            body({isStatic: true})
+                rect(32, 32),
+                opacity(0),
+                area(),
+                body({isStatic: true})
             ],
-
+            4: () => [
+                sprite('portal'),
+                area(),
+                body({ isStatic: true }),
+                'portal'
+                ],
+                
             1: () => [
                 sprite('platform-middle'),
                 area(),
                 body({ isStatic: true })
             ],
-            "$": () => [
+            '$': () => [
 			    sprite("coin"),
 			    area(),
+			    scale(.5),
 			    pos(0, 1),
 			    offscreen({ hide: true }),
-			"coin",
+			    'coin'
+			    
 		],
 
         }
 
     })
     
-// map.use(scale(4))
+ map.use(scale(1.5))
 
 const player = add([
     sprite('idle-sprite'),
@@ -200,14 +180,27 @@ onKeyPress('up', () => {
     }
 })
 
-// camScale(1.5)
 
 onUpdate(() => {
-
+   if (player.pos.y >= fall) {
+     go('game', { score: score.value})
+    }
     if (player.previousHeight){
         player.heightDelta = player.previousHeight - player.pos.y
     }
     player.previousHeight = player.pos.y
+    
+     const cameraLeftBound = 550
+    const cameraRightBound = 3000
+    const cameraVerticalOffset = player.pos.y - 100
+   if (cameraLeftBound > player.pos.x) {
+        camPos(cameraLeftBound, cameraVerticalOffset)
+    } else if (cameraRightBound < player.pos.x) {
+        camPos(cameraRightBound, cameraVerticalOffset)
+    } else {
+        camPos(player.pos.x, cameraVerticalOffset)
+    }
+  
 
     if (player.curAnim() !== 'run-anim' && player.isGrounded()) {
         player.use(sprite('idle-sprite'))
@@ -231,7 +224,8 @@ onUpdate(() => {
 })
  score = add([
     text("Coins: 0/10"),
-    pos(24, 24),
+     pos(24, 24),
+    follow(player, -100),
     { value: 0 },
 ])
 player.onCollide("coin", (c) => {
@@ -240,38 +234,232 @@ player.onCollide("coin", (c) => {
     score.text = `Coins: ${score.value}/10`
 })
 
-	player.onCollide("portal", () => {
-		play("portal")
-		if (levelId + 1 < LEVELS.length) {
-			go("game", {
-				levelId: levelId + 1,
-				coins: coins,
-			})
-		} else {
-			go("win")
-		}
-	})
-
+player.onCollide("portal", () => {
+		if (score.value >= 10) {
+			go("game2", score.value = 0)
+		} 
+	})	
 })
+
+scene("game2", ({ score }) => {
+add([
+    sprite('background-2'),
+    fixed(),
+    scale(2.2)
+])
+
+loadSpriteAtlas('./images/Tiles.png', {
+    'platform-left': {
+        x: 440,
+        y: 380,
+        width: 32,
+        height: 32
+    },
+    'platform-middle': {
+        x: 520,
+        y: 240,
+        width: 32,
+        height: 32
+    },
+})
+const map = addLevel([
+        '5                                          5',
+        '5          $$$         $ $        $        5',
+        '5         11111      11111     11111       5',
+        '5                                          5',
+        '5              $  $          $             5',
+        '5              11111       11111           5',
+        '5      $  $                                5',
+        '5     11111         111111             111 5',
+        '5                      1111111             5',
+        '5                                  $       5',
+        '5          $ $ $ $                 1111    5',
+        '5          1111111                         5',
+        '5                                          5',
+        '5                          111111111111111 5',
+        '5                                          5',
+        '5                   111111                 5',
+        '5           11111                          5',
+        '5                                       4  5',
+        '11111111111111111111111111111111111111111111',
+        '5                                          5',
+        '5                                          5',
+    ],
+
+    {
+        tileWidth: 32,
+        tileHeight: 32,
+        tiles: {
+            5: () => [
+                rect(32, 32),
+                opacity(0),
+                area(),
+                body({isStatic: true})
+            ],
+            4: () => [
+                sprite('portal'),
+                area(),
+                body({ isStatic: true }),
+                'portal'
+                ],
+                
+            1: () => [
+                sprite('platform-left'),
+                area(),
+                body({ isStatic: true })
+            ],
+            '$': () => [
+			    sprite("coin"),
+			    area(),
+			    scale(.5),
+			    pos(0, 1),
+			    offscreen({ hide: true }),
+			    'coin'
+			    
+		],
+
+        }
+
+    })
+    
+ map.use(scale(1.5))
+
+const player = add([
+    sprite('idle-sprite'),
+    scale(2),
+    area({shape: new Rect(vec2(0), 16, 16), offset: vec2(0,16)}),
+    anchor('center'),
+    body(),
+    pos(80,210),
+    {
+        speed: 500,
+        previousHeight: null,
+        heightDelta: 0,
+        direction: 'right'
+    }
+])
+
+player.play('idle-anim')
+
+onKeyDown('right', () => {
+    if (player.curAnim() !== 'run-anim' && player.isGrounded()) {
+        player.use(sprite('run-sprite'))
+        player.play('run-anim')
+    }
+
+    if (player.direction !== 'right') player.direction = 'right'
+
+    player.move(player.speed, 0)
+})
+
+onKeyRelease('right', () => {
+    player.use(sprite('idle-sprite'))
+    player.play('idle-anim')
+})
+
+onKeyDown('left', () => {
+    if (player.curAnim() !== 'run-anim' && player.isGrounded()) {
+        player.use(sprite('run-sprite'))
+        player.play('run-anim')
+    }
+
+    if (player.direction !== 'left') player.direction = 'left'
+
+    player.move(-player.speed, 0)
+})
+
+onKeyRelease('left', () => {
+    player.use(sprite('idle-sprite'))
+    player.play('idle-anim')
+})
+
+onKeyPress('up', () => {
+    if (player.isGrounded()) {
+        player.jump()
+    }
+})
+
+
+onUpdate(() => {
+   if (player.pos.y >= fall) {
+     go('game2', { score: score.value})
+    }
+    if (player.previousHeight){
+        player.heightDelta = player.previousHeight - player.pos.y
+    }
+    player.previousHeight = player.pos.y
+    
+     const cameraLeftBound = 550
+    const cameraRightBound = 3000
+    const cameraVerticalOffset = player.pos.y - 100
+   if (cameraLeftBound > player.pos.x) {
+        camPos(cameraLeftBound, cameraVerticalOffset)
+    } else if (cameraRightBound < player.pos.x) {
+        camPos(cameraRightBound, cameraVerticalOffset)
+    } else {
+        camPos(player.pos.x, cameraVerticalOffset)
+    }
+  
+
+    if (player.curAnim() !== 'run-anim' && player.isGrounded()) {
+        player.use(sprite('idle-sprite'))
+        player.play('idle-anim')
+    }
+     if (player.curAnim() !== 'jump-anim' && !player.isGrounded() && player.heightDelta > 0) {
+        player.use(sprite('jump-sprite'))
+        player.play('jump-anim')
+    }
+
+    if (player.curAnim() !== 'fall-anim' && !player.isGrounded() && player.heightDelta < 0) {
+        player.use(sprite('fall-sprite'))
+        player.play('fall-anim')
+    }
+
+    if (player.direction === 'left'){
+        player.flipX = true
+    } else {
+        player.flipX = false
+    }
+})
+ score = add([
+    text("Coins: 0/10"),
+     pos(24, 24),
+    follow(player, -100),
+    { value: 0 },
+])
+player.onCollide("coin", (c) => {
+    destroy(c)
+    score.value += 1
+    score.text = `Coins: ${score.value}/10`
+})
+
+player.onCollide("portal", () => {
+		if (score.value >= 10) {
+			go("gameover", score.value)
+		} 
+	})	
+})
+
 scene("gameover", (score) => {
- 
+    add([
+    sprite('background-3'),
+    fixed(),
+    scale(2.6)
+])
   add([
     text(
-      "gameover!\n"
-      + "score: " + score
-      + "\nhigh score: " + highScore,
+      "     Gameover!\n" + 'Space to play again\n',
       {size: 45}
-    )
+    ),
+    pos(width() / 2, height() / 2),
+    anchor('center')
   ]);
 
-  keyPress("space", () => {
-    go("game");
+  onKeyDown("space", () => {
+    go("game", { score: 0});
   });
 });
 
 
 go("game", { score: 0})
-
-// // reset cursor to default at frame start for easier cursor management
-// onUpdate(() => cursor("default"))
 
