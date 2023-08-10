@@ -192,8 +192,8 @@ onUpdate(() => {
     
      const cameraLeftBound = 550
     const cameraRightBound = 3000
-    const cameraVerticalOffset = player.pos.y - 100
-   if (cameraLeftBound > player.pos.x) {
+    const cameraVerticalOffset = player.pos.y - 10
+  if (cameraLeftBound > player.pos.x) {
         camPos(cameraLeftBound, cameraVerticalOffset)
     } else if (cameraRightBound < player.pos.x) {
         camPos(cameraRightBound, cameraVerticalOffset)
@@ -250,8 +250,8 @@ add([
 
 loadSpriteAtlas('./images/Tiles.png', {
     'platform-left': {
-        x: 440,
-        y: 380,
+        x: 639,
+        y: 436,
         width: 32,
         height: 32
     },
@@ -269,7 +269,7 @@ const map = addLevel([
         '5                                          5',
         '5              $  $          $             5',
         '5              11111       11111           5',
-        '5      $  $                                5',
+        '5      $  $                             4  5',
         '5     11111         111111             111 5',
         '5                      1111111             5',
         '5                                  $       5',
@@ -280,7 +280,7 @@ const map = addLevel([
         '5                                          5',
         '5                   111111                 5',
         '5           11111                          5',
-        '5                                       4  5',
+        '5                                          5',
         '11111111111111111111111111111111111111111111',
         '5                                          5',
         '5                                          5',
@@ -389,10 +389,10 @@ onUpdate(() => {
     }
     player.previousHeight = player.pos.y
     
-     const cameraLeftBound = 550
+    const cameraLeftBound = 550
     const cameraRightBound = 3000
     const cameraVerticalOffset = player.pos.y - 100
-   if (cameraLeftBound > player.pos.x) {
+  if (cameraLeftBound > player.pos.x) {
         camPos(cameraLeftBound, cameraVerticalOffset)
     } else if (cameraRightBound < player.pos.x) {
         camPos(cameraRightBound, cameraVerticalOffset)
@@ -448,7 +448,7 @@ scene("gameover", (score) => {
 ])
   add([
     text(
-      "     Gameover!\n" + 'Space to play again\n',
+      "     Victory!\n" + 'Space to play again\n',
       {size: 45}
     ),
     pos(width() / 2, height() / 2),

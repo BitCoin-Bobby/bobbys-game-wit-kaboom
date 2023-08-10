@@ -17,8 +17,8 @@ body {
 .parachute {
     width: 30%; 
     position: absolute;
-    top: 320px; 
-    left: 435px; 
+    top: 250px; 
+    left: 335px; 
     transform: translateY(-50%); 
     z-index: 1;
 }
