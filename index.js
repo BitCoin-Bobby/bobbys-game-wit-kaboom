@@ -51,8 +51,8 @@ add([
 
 loadSpriteAtlas('./images/Tiles.png', {
     'platform-left': {
-        x: 440,
-        y: 380,
+        x: 639,
+        y: 436,
         width: 32,
         height: 32
     },
